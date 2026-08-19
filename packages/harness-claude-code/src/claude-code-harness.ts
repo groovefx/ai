@@ -19,6 +19,7 @@ import {
   type HarnessV1Session,
   type HarnessV1Skill,
   type HarnessV1StreamPart,
+  harnessV1StateDirectory,
 } from '@ai-sdk/harness';
 import {
   applyCredentialForwarding,
@@ -926,17 +927,24 @@ export function createClaudeCode(
           credentialForwarding: settings.credentialForwarding,
         });
       }
-      const bootstrapDir = posix.resolve(
+      // Harness SDK state (bootstrap, per-session runs) lives in the
+      // provider's state directory, which is the working directory unless the
+      // provider separates the two to keep the workspace clean.
+      const stateDir = harnessV1StateDirectory({
+        stateDirectory:
+          'stateDirectory' in sandboxSession
+            ? sandboxSession.stateDirectory
+            : undefined,
         defaultWorkingDirectory,
-        BOOTSTRAP_DIR,
-      );
+      });
+      const bootstrapDir = posix.resolve(stateDir, BOOTSTRAP_DIR);
       // The conversation the host wants back, when it is known. Absent on
       // state written before this field existed; those resumes fall back to
       // the `continue` flag as before.
       const resumeSessionId = resumeData?.claudeSessionId;
 
       const workDir = startOpts.sessionWorkDir;
-      const sessionDataDir = `${defaultWorkingDirectory}/.agent-runs/${startOpts.sessionId}`;
+      const sessionDataDir = `${stateDir}/.agent-runs/${startOpts.sessionId}`;
       const bridgeStateDir = `${sessionDataDir}/bridge`;
       const timeoutMs = settings.startupTimeoutMs ?? 120_000;
 
