@@ -50,8 +50,10 @@ import { WebSocket } from 'ws';
 import { z } from 'zod/v4';
 import {
   CLAUDE_CODE_BOOTSTRAP_DIR as BOOTSTRAP_DIR,
+  CLAUDE_CODE_INSTALL_COMMAND,
   getClaudeCodeBootstrap,
 } from './claude-code-bootstrap';
+import { resolveClaudeExecutable } from './resolve-claude-executable';
 import {
   CLAUDE_CODE_CREDENTIAL_ENVIRONMENT_VARIABLES,
   createClaudeCodeRequestTransformations,
@@ -840,6 +842,14 @@ export function createClaudeCode(
     supportsBuiltinToolFiltering: true,
     lifecycleStateSchema: claudeCodeResumeStateSchema,
     getBootstrap: getClaudeCodeBootstrap,
+    // The adapter drives the environment's own `claude` — the installation the
+    // user configured, authenticated, and can continue conversations with
+    // directly — and only installs this pinned version, with consent, when the
+    // environment has none.
+    installation: {
+      executable: 'claude',
+      command: CLAUDE_CODE_INSTALL_COMMAND,
+    },
     doStart: async startOpts => {
       const sandboxSession = startOpts.sandboxSession;
       const toolSafeSandboxSession =
@@ -1011,6 +1021,15 @@ export function createClaudeCode(
           return createSession({
             sessionId: startOpts.sessionId,
             channel: attachChannel,
+            // The live bridge keeps serving turns, and each turn's query runs
+            // the environment executable this process resolves.
+            claudeExecutablePath: await resolveClaudeExecutable({
+              session: toolSafeSandboxSession,
+              requestInstallConsent: startOpts.requestInstallConsent,
+              ...(startOpts.abortSignal
+                ? { abortSignal: startOpts.abortSignal }
+                : {}),
+            }),
             ...(resumeSessionId ? { resumeSessionId } : {}),
             // The live bridge was spawned by another process; this one owns no
             // process handle. The session lifecycle method decides whether the
@@ -1074,6 +1093,16 @@ export function createClaudeCode(
       const port = resolveBridgePort({
         sandboxSession,
         override: settings.port,
+      });
+      // The environment's own `claude` is the one the bridge drives; resolve
+      // (or, with consent, install) it before spawning so a missing
+      // executable fails startup rather than the first turn.
+      const claudeExecutablePath = await resolveClaudeExecutable({
+        session: toolSafeSandboxSession,
+        requestInstallConsent: startOpts.requestInstallConsent,
+        ...(startOpts.abortSignal
+          ? { abortSignal: startOpts.abortSignal }
+          : {}),
       });
       const token =
         settings.mintBridgeToken == null
@@ -1187,6 +1216,7 @@ export function createClaudeCode(
         sessionId: startOpts.sessionId,
         channel,
         proc,
+        claudeExecutablePath,
         model: settings.model,
         maxTurns: settings.maxTurns,
         env: sandboxClaudeEnvironment,
@@ -1517,6 +1547,7 @@ function createSession({
   sessionId,
   channel,
   proc,
+  claudeExecutablePath,
   model,
   maxTurns,
   env,
@@ -1541,6 +1572,8 @@ function createSession({
   channel: ClaudeCodeChannel;
   /** Undefined on `attach` — the live bridge was spawned by another process. */
   proc: Experimental_SandboxProcess | undefined;
+  /** The environment's `claude`, resolved (or installed) at start. */
+  claudeExecutablePath: string;
   model: string | undefined;
   maxTurns: number | undefined;
   env: Readonly<Record<string, string>> | undefined;
@@ -1795,6 +1828,7 @@ function createSession({
         ...(permissionMode ? { permissionMode } : {}),
         ...(builtinToolFiltering ? { builtinToolFiltering } : {}),
         ...(debug ? { debug } : {}),
+        claudeExecutablePath,
         ...(pendingResumeFlag && lastClaudeSessionId
           ? { resumeSessionId: lastClaudeSessionId }
           : pendingResumeFlag
@@ -1872,6 +1906,7 @@ function createSession({
           ...(permissionMode ? { permissionMode } : {}),
           ...(builtinToolFiltering ? { builtinToolFiltering } : {}),
           ...(debug ? { debug } : {}),
+          claudeExecutablePath,
           ...(lastClaudeSessionId
             ? { resumeSessionId: lastClaudeSessionId }
             : { continue: true }),
