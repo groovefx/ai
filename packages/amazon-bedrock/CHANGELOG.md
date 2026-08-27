@@ -1,5 +1,14 @@
 # @ai-sdk/amazon-bedrock
 
+## 3.0.126
+
+### Patch Changes
+
+- 0393692: Accept citation deltas in Amazon Bedrock streaming responses.
+- Updated dependencies [26165ee]
+  - @ai-sdk/provider-utils@3.0.36
+  - @ai-sdk/anthropic@2.0.100
+
 ## 3.0.125
 
 ### Patch Changes
