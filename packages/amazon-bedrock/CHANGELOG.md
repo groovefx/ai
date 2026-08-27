@@ -1,5 +1,16 @@
 # @ai-sdk/amazon-bedrock
 
+## 4.0.166
+
+### Patch Changes
+
+- fb9b783: feat(amazon-bedrock): add model family setting for embeddings to support ARN
+- 6b88988: Accept citation deltas in Amazon Bedrock streaming responses.
+- Updated dependencies [cc23556]
+  - @ai-sdk/provider-utils@4.0.50
+  - @ai-sdk/anthropic@3.0.115
+  - @ai-sdk/openai@3.0.105
+
 ## 4.0.165
 
 ### Patch Changes
