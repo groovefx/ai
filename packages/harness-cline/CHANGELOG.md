@@ -1,5 +1,16 @@
 # @ai-sdk/harness-cline
 
+## 1.0.20
+
+### Patch Changes
+
+- 14d4fc0: feat(harness): allow changing harness settings between turns via `prepareCall()` support on `HarnessAgent`
+- 5021768: fix(harness-cline): use native `skills` tool instead of manual file-based workaround
+- Updated dependencies [14d4fc0]
+- Updated dependencies [90192f1]
+  - @ai-sdk/harness@1.0.93
+  - @ai-sdk/provider-utils@5.0.33
+
 ## 1.0.19
 
 ### Patch Changes

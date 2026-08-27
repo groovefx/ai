@@ -1,5 +1,15 @@
 # @ai-sdk/harness-claude-code
 
+## 1.0.97
+
+### Patch Changes
+
+- 14d4fc0: feat(harness): allow changing harness settings between turns via `prepareCall()` support on `HarnessAgent`
+- Updated dependencies [14d4fc0]
+- Updated dependencies [90192f1]
+  - @ai-sdk/harness@1.0.93
+  - @ai-sdk/provider-utils@5.0.33
+
 ## 1.0.96
 
 ### Patch Changes

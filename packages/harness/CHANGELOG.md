@@ -1,5 +1,16 @@
 # @ai-sdk/harness
 
+## 1.0.93
+
+### Patch Changes
+
+- 14d4fc0: feat(harness): allow changing harness settings between turns via `prepareCall()` support on `HarnessAgent`
+- Updated dependencies [6669d69]
+- Updated dependencies [a6463ca]
+- Updated dependencies [90192f1]
+  - ai@7.0.84
+  - @ai-sdk/provider-utils@5.0.33
+
 ## 1.0.92
 
 ### Patch Changes

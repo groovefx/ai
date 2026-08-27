@@ -4,6 +4,14 @@
 
 ### Patch Changes
 
+- Updated dependencies [6669d69]
+- Updated dependencies [a6463ca]
+  - ai@7.0.84
+
+## 0.0.1
+
+### Patch Changes
+
 - Updated dependencies [8dd86a9]
 - Updated dependencies [fda13b3]
 - Updated dependencies [957146c]

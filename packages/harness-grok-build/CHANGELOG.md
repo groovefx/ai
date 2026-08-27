@@ -1,5 +1,16 @@
 # @ai-sdk/harness-grok-build
 
+## 1.0.30
+
+### Patch Changes
+
+- 39e8870: feat(harness-grok-build): update underlying SDK and add support for `reasoningEffort` control
+- Updated dependencies [14d4fc0]
+- Updated dependencies [90192f1]
+  - @ai-sdk/harness-acp@1.0.31
+  - @ai-sdk/harness@1.0.93
+  - @ai-sdk/provider-utils@5.0.33
+
 ## 1.0.29
 
 ### Patch Changes
